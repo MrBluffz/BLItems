@@ -27,6 +27,9 @@ Config.Notification = { -- [ 'chat' | 'ns' | 'mythic_old' | 'mythic_new' | 'esx'
 	server = 'esx',
 }
 
+Config.Locale = "en" -- Locale is only in english for now. Make your own Locale file, then change the name here. Share any custom Locale files with me so I can update the main repository!
+
+
 Config.ItemNames = {
 	{
 		name = 'meth',
