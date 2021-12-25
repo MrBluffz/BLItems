@@ -23,8 +23,8 @@ Config = {}
 -- DO NOT TOUCH ABOVE
 -- DO NOT TOUCH ABOVE
 
-Config.NotificationType = { -- [ 'chat' | 'ns' | 'mythic_old' | 'mythic_new' | 'esx' | 'custom' ].
-	server = 'mythic_new',
+Config.Notification = { -- [ 'chat' | 'ns' | 'mythic_old' | 'mythic_new' | 'esx' | 'custom' ].
+	server = 'esx',
 }
 
 Config.ItemNames = {
