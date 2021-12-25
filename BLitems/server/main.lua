@@ -76,35 +76,55 @@ notify = function(source, type, msg, duration, title)
 	end
 end
 
+function RegisterItems()
+	for i = 1, #Config.ItemNames do
+		ESX.RegisterUsableItem(Config.ItemNames[i].name, function(source)
+			local _source = source
+			local xPlayer = ESX.GetPlayerFromId(source)
+			local drug = xPlayer.getInventoryItem(Config.ItemNames[i].name).count
+			local size = CheckSize(_source, Config.ItemNames[i].name, Config.ItemNames[i].Lsize, drug)
+
+			if size == 'small' then
+				TriggerEvent('BLdrugitems:makesmall', _source, Config.ItemNames[i].name)
+			elseif size == 'large' then
+				TriggerEvent('BLdrugitems:makelarge', _source, Config.ItemNames[i].name)
+			else
+				notify(_source, 3, _U('making_error'), 5000, 'Creation Error')
+			end
+
+		end)
+	end
+end
+
 function CheckSize(source, drug, size, count)
-		local xPlayer = ESX.GetPlayerFromId(source)
+	local xPlayer = ESX.GetPlayerFromId(source)
 	local _source = source
 	local tsize = nil
- if Config.Items[drug].large and next(Config.Items[drug].large) then
-  for k, v in pairs(Config.Items[drug].large) do
-   if k ~= 'final' then
-    if xPlayer.getInventoryItem(k).count == 0 then
-     tsize = 'small'
+	if Config.Items[drug].large and next(Config.Items[drug].large) then
+		for k, v in pairs(Config.Items[drug].large) do
+			if k ~= 'final' then
+				if xPlayer.getInventoryItem(k) and xPlayer.getInventoryItem(k).count > 0 then
+					tsize = 'large'
+				else
+					tsize = 'small'
      goto itstiny
-    else
-     tsize = 'large'
-    end
-   end
-  end
- else
-  tsize = 'small'
- end
+				end
+			end
+		end
+	else
+		tsize = 'small'
+	end
 
 	::itstiny::
 	if tsize == 'large' and count < size then
 		tsize = 'small'
 		return tsize
-	elseif tsize == 'large' and count > size then
+	elseif tsize == 'large' and count >= size then
 		return tsize
 	elseif tsize == 'small' then
 		return tsize
 	else
-		notify(_source, 3, _U('size_error'), 'SIZE CHECK ERROR', 5000)
+		notify(_source, 3, _U('size_error'), 5000, 'SIZE CHECK ERROR')
 	end
 end
 
@@ -116,17 +136,22 @@ AddEventHandler('BLdrugitems:makesmall', function(source, drug)
 	local missing, fproduct, fcount = false, nil, nil
 
 	for k, v in pairs(Config.Items[drug].small) do
-		local minimum = v.count
-		local havethis = xPlayer.getInventoryItem(k).count
-		if k ~= 'final' and havethis < minimum then
-			missing = true
-			table.insert(MItems, k)
+		if k ~= 'final' then
+			local minimum = v.count
+			local havethis = 0
+   if xPlayer.getInventoryItem(k).count ~= nil then
+    havethis = xPlayer.getInventoryItem(k).count
+   end
+			if havethis < minimum then
+				missing = true
+				table.insert(MItems, k)
+			end
 		end
 	end
 
 	if missing then
 		for z = 1, #MItems do
-			notify(_source, 3, _U('missing_items', MItems[z]), 'Not Enough Resources', 5000)
+			notify(_source, 3, _U('missing_items', MItems[z]), 5000, 'Not Enough Resources')
 			Wait(1)
 		end
 	else
@@ -167,23 +192,3 @@ AddEventHandler('BLdrugitems:makelarge', function(source, drug)
 end)
 
 AddEventHandler('onResourceStart', function(resourceName) if (GetCurrentResourceName() == resourceName) then RegisterItems() end end)
-
-function RegisterItems()
-	for i = 1, #Config.ItemNames do
-		ESX.RegisterUsableItem(Config.ItemNames[i].name, function(source)
-			local _source = source
-			local xPlayer = ESX.GetPlayerFromId(source)
-			local drug = xPlayer.getInventoryItem(Config.ItemNames[i].name).count
-			local size = CheckSize(_source, Config.ItemNames[i].name, Config.ItemNames[i].Lsize, drug)
-
-			if size == 'small' then
-				TriggerEvent('BLdrugitems:makesmall', _source, Config.ItemNames[i].name)
-			elseif size == 'large' then
-				TriggerEvent('BLdrugitems:makelarge', _source, Config.ItemNames[i].name)
-			else
-				notify(_source, 3, _U('making_error'), 'Creation Error', 5000)
-			end
-
-		end)
-	end
-end
