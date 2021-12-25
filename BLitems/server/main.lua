@@ -77,19 +77,23 @@ notify = function(source, type, msg, duration, title)
 end
 
 function CheckSize(source, drug, size, count)
-	local xPlayer = ESX.GetPlayerFromId(source)
+		local xPlayer = ESX.GetPlayerFromId(source)
 	local _source = source
 	local tsize = nil
-	for k, v in pairs(Config.Items[drug].large) do
-		if k ~= 'final' then
-			if xPlayer.getInventoryItem(k).count == 0 then
-				tsize = 'small'
-				goto itstiny
-			else
-				tsize = 'large'
-			end
-		end
-	end
+ if Config.Items[drug].large and next(Config.Items[drug].large) then
+  for k, v in pairs(Config.Items[drug].large) do
+   if k ~= 'final' then
+    if xPlayer.getInventoryItem(k).count == 0 then
+     tsize = 'small'
+     goto itstiny
+    else
+     tsize = 'large'
+    end
+   end
+  end
+ else
+  tsize = 'small'
+ end
 
 	::itstiny::
 	if tsize == 'large' and count < size then
